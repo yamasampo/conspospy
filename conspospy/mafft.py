@@ -1,5 +1,6 @@
 # Copyright 2019 by Kent Kawashima.  All rights reserved.
 
+import os
 import logging
 import subprocess as proc
 
@@ -11,7 +12,7 @@ from .constants import GENETIC_CODE
 def mafft_align(infile, output_aln, iterations=1000, mafft_path='mafft', method='genafpair'):
     c = proc.run(
         f'{mafft_path} --{method} --maxiterate {iterations} '
-        f'{infile} > {output_aln}',
+        f'"{infile}" > "{output_aln}"',
         shell=True)
     return c
 
@@ -72,16 +73,19 @@ def mafft_align_codons(
     translate=True,
     aln_method='einsi', aln_iterations=1000):
     
+    trl_path = os.path.join(
+        os.path.dirname(aa_path), os.path.basename(nucl_path) + '.trl.faa')
+
     # Translate if necessary
     if translate:
-        translate_fasta(nucl_path, nucl_path + '.trl.faa')
+        translate_fasta(nucl_path, trl_path)
     # Align by MAFFT
     if aln_method == 'ginsi':
-        run_obj = mafft_ginsi_align(nucl_path + '.trl.faa', aa_path, aln_iterations)
+        run_obj = mafft_ginsi_align(trl_path, aa_path, aln_iterations)
     elif aln_method == 'linsi':
-        run_obj = mafft_linsi_align(nucl_path + '.trl.faa', aa_path, aln_iterations)
+        run_obj = mafft_linsi_align(trl_path, aa_path, aln_iterations)
     elif aln_method == 'einsi':
-        run_obj = mafft_einsi_align(nucl_path + '.trl.faa', aa_path, aln_iterations)
+        run_obj = mafft_einsi_align(trl_path, aa_path, aln_iterations)
     else:
         raise ValueError(
             'Invalid alignment method. Select "ginsi", "linsi", or "einsi" '

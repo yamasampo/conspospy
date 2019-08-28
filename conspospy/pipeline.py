@@ -1,5 +1,6 @@
 # Copyright 2019 by Kent Kawashima.  All rights reserved.
 
+import os
 import numpy as np
 from .utils import fasta_to_seqobj_list
 from .mafft import mafft_align_codons
@@ -14,21 +15,28 @@ def codon_mafft_conspos(
     # Perform mafft alignment for global, local, and affine gap methods
     # This is for CDS
     # TODO: For introns change functions here to call mafft_ginsi_align, mafft_linsi_align and mafft_einsi_align.
+    ginsi_aln_path = os.path.join(
+        os.path.dirname(aln_path), os.path.basename(nucl_path) + '.ginsi.cod')
+    linsi_aln_path = os.path.join(
+        os.path.dirname(aln_path), os.path.basename(nucl_path) + '.linsi.cod')
+    einsi_aln_path = os.path.join(
+        os.path.dirname(aln_path), os.path.basename(nucl_path) + '.einsi.cod')
+
     mafft_align_codons(
-        nucl_path, nucl_path + '.ginsi.cod.faa.aln', nucl_path + '.ginsi.cod.fna.aln',
+        nucl_path, ginsi_aln_path + '.faa.aln', ginsi_aln_path + '.fna.aln',
         aln_method='ginsi', aln_iterations=aln_iterations)
     mafft_align_codons(
-        nucl_path, nucl_path + '.linsi.cod.faa.aln', nucl_path + '.linsi.cod.fna.aln',
+        nucl_path, linsi_aln_path + '.faa.aln', linsi_aln_path + '.fna.aln',
         translate=False, aln_method='linsi', aln_iterations=aln_iterations)
     mafft_align_codons(
-        nucl_path, nucl_path + '.einsi.cod.faa.aln', nucl_path + '.einsi.cod.fna.aln',
+        nucl_path, einsi_aln_path + '.faa.aln', einsi_aln_path + '.fna.aln',
         translate=False, aln_method='einsi', aln_iterations=aln_iterations)
 
     # Create position arrays for each alignment
     aln_list = {
-        'ginsi': fasta_to_seqobj_list(nucl_path + '.ginsi.cod.fna.aln'),
-        'linsi': fasta_to_seqobj_list(nucl_path + '.linsi.cod.fna.aln'),
-        'einsi': fasta_to_seqobj_list(nucl_path + '.einsi.cod.fna.aln'),
+        'ginsi': fasta_to_seqobj_list(ginsi_aln_path + '.fna.aln'),
+        'linsi': fasta_to_seqobj_list(linsi_aln_path + '.fna.aln'),
+        'einsi': fasta_to_seqobj_list(einsi_aln_path + '.fna.aln'),
     }
     aln_d = {
         'ginsi': {s.name: s.sequence for s in aln_list['ginsi']},
