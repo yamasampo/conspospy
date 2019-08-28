@@ -1,7 +1,7 @@
 # Copyright 2019 by Kent Kawashima.  All rights reserved.
 
 import numpy as np
-from .read import fasta_to_seqobj_list
+from .utils import fasta_to_seqobj_list
 from .mafft import mafft_align_codons
 from .conspos import encode_codon_aln_pos
 

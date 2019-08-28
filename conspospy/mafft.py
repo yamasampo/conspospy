@@ -3,7 +3,8 @@
 import logging
 import subprocess as proc
 
-from .read import fasta_to_seqobj_list, fasta_to_dict, Sequence
+from .utils import fasta_to_seqobj_list, fasta_to_dict, Sequence, \
+    translate_fasta, codon_generator
 from .constants import GENETIC_CODE
 
 # To call mafft
