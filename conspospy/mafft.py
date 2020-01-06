@@ -5,7 +5,7 @@ import logging
 import subprocess as proc
 
 from .utils import fasta_to_seqobj_list, fasta_to_dict, Sequence, \
-    translate_fasta, codon_generator
+    translate_fasta, codon_generator, remove_stopcodons_from_fasta
 from .constants import GENETIC_CODE
 
 # To call mafft
@@ -73,12 +73,16 @@ def mafft_align_codons(
     translate=True,
     aln_method='einsi', aln_iterations=1000):
     
+    rmstopcod_path = os.path.join(
+        os.path.dirname(aa_path), os.path.basename(nucl_path) + '.rmstop.fa')
+    remove_stopcodons_from_fasta(nucl_path, rmstopcod_path)
+
     trl_path = os.path.join(
         os.path.dirname(aa_path), os.path.basename(nucl_path) + '.trl.faa')
 
     # Translate if necessary
     if translate:
-        translate_fasta(nucl_path, trl_path)
+        translate_fasta(rmstopcod_path, trl_path)
     # Align by MAFFT
     if aln_method == 'ginsi':
         run_obj = mafft_ginsi_align(trl_path, aa_path, aln_iterations)
@@ -93,7 +97,7 @@ def mafft_align_codons(
         )
     
     # Realign nucleotide sequences by aligned aa sequences
-    codon_aln_lst = align_codons_by_aa(nucl_path, aa_path)
+    codon_aln_lst = align_codons_by_aa(rmstopcod_path, aa_path)
     i = 0
     # Write aligned codon sequences
     with open(codon_path, 'w') as f:
