@@ -70,3 +70,7 @@ GENETIC_CODE = {
     'TTG': 'L',
     'TTT': 'F',
 }
+
+STOPCODONS = {
+    'TAA', 'TAG', 'TGA'
+}
