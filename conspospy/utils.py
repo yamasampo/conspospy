@@ -3,7 +3,7 @@
 from collections import namedtuple, OrderedDict, Counter
 import numpy as np
 
-from .constants import GENETIC_CODE
+from .constants import GENETIC_CODE, STOPCODONS
 
 # Creates an instance of Sequence object
 Sequence = namedtuple('Sequence', ['name', 'description', 'sequence'])
@@ -73,6 +73,29 @@ def translate_fasta(nucl_path, aa_path):
     i = 0
     with open(aa_path, 'w') as f:
         for s in aa_list:
+            if s.description:
+                print(f'>{s.name} {s.description}', file=f)
+            else:
+                print(f'>{s.name}', file=f)
+            print(s.sequence, file=f)
+            i += 1
+    return i
+
+def remove_stopcodons(nucl_seq):
+    return ''.join(
+        [codon for codon in codon_generator(nucl_seq) 
+            if codon not in STOPCODONS]
+    )
+
+def remove_stopcodons_from_fasta(in_nucl_path, out_nucl_path):
+    nucl_list = fasta_to_seqobj_list(in_nucl_path)
+    rm_nucl_list = [
+        Sequence(s.name, s.description, remove_stopcodons(s.sequence))
+        for s in nucl_list
+    ]
+    i = 0
+    with open(out_nucl_path, 'w') as f:
+        for s in rm_nucl_list:
             if s.description:
                 print(f'>{s.name} {s.description}', file=f)
             else:
