@@ -22,7 +22,7 @@ def encode_seq_pos(seq_list):
 def encode_codon_aln_pos(aln_d):
     pos_lists = []
     for key, seq in aln_d.items():
-        nucl_seq = codon_generator(seq)
+        #nucl_seq = codon_generator(seq)
         pos_lists.append(encode_seq_pos(seq))
         
     # if seq_pos does not have the same lengths, numpy gives an error
