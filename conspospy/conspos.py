@@ -74,6 +74,35 @@ def add_conspos_marker(
 #         -> 
 #         np.array([T, T, F, F]) by np.all(template_array == array, axis=0) # axis=0 is necessary
 #         np.array([T, T, F, F]) ... np.array([1, 1, 0, 0]) is summed to conspos_array while looping
+        
+        # NOTE: numpy will retrun an error (DeprecationWarning) and return single False 
+        # when two arrays with different lengths are compared.
+        # Example:
+        # In [72]: tmplate_array = aln_array['einsi']                                                                                                                                                                          
+
+        # In [73]: aln_array['einsi'].shape                                                                                                                                                                                    
+        # Out[73]: (4, 7770)
+
+        # In [74]: aln_array['linsi'].shape                                                                                                                                                                                    
+        # Out[74]: (4, 7683)
+
+        # In [75]: tmplate_array == aln_array['einsi']                                                                                                                                                                         
+        # Out[75]: 
+        # array([[ True,  True,  True, ...,  True,  True,  True],
+        #     [ True,  True,  True, ...,  True,  True,  True],
+        #     [ True,  True,  True, ...,  True,  True,  True],
+        #     [ True,  True,  True, ...,  True,  True,  True]])
+
+        # In [76]: tmplate_array == aln_array['linsi']                                                                                                                                                                         
+        # /Users/haruka/anaconda/envs/py37/bin/ipython:1: DeprecationWarning: elementwise comparison failed; this will raise an error in the future.
+        # #!/Users/haruka/anaconda/envs/py37/bin/python
+        # Out[76]: False
+
+        # TODO: Fix this `template_array == array` to comparison between surely identical arrays.
+        # Maybe use refjoin package to make several alignments comparable and 
+        # then compare across subsets of rows, each of those represents an alignment before 
+        # joining. How to put marker back to represent alignment though...? 
+        # We have to keep both original and after joining positions.
         conspos_array += np.all(template_array == array, axis=0)
     
     marker_seq = ''.join([
